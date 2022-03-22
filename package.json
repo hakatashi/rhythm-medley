@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --ext .js,.ts,.jsx,.tsx --ignore-path .gitignore --fix ."
   },
   "repository": {
     "type": "git",
@@ -12,12 +13,15 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/hakatashi/rhythm-medley/issues"
   },
   "homepage": "https://github.com/hakatashi/rhythm-medley#readme",
   "devDependencies": {
+    "@hakatashi/eslint-config": "^1.18.0",
+    "@typescript-eslint/parser": "^5.16.0",
+    "eslint": "^7.32.0",
     "typescript": "^4.6.2"
   },
   "dependencies": {
