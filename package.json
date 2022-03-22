@@ -20,11 +20,13 @@
   "homepage": "https://github.com/hakatashi/rhythm-medley#readme",
   "devDependencies": {
     "@hakatashi/eslint-config": "^1.18.0",
+    "@types/three": "^0.138.0",
     "@typescript-eslint/parser": "^5.16.0",
     "eslint": "^7.32.0",
     "typescript": "^4.6.2"
   },
   "dependencies": {
+    "@react-three/drei": "^8.18.10",
     "@react-three/fiber": "^7.0.26",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
