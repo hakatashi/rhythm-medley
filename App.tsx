@@ -1,5 +1,5 @@
 import {Canvas, useFrame, useLoader, useThree} from '@react-three/fiber';
-import React, {useRef, useState, useCallback, Suspense} from 'react';
+import React, {useRef, useState, useCallback, useEffect, Suspense} from 'react';
 import ReactDOM from 'react-dom';
 import useMeasure from 'react-use-measure';
 import {TextureLoader, Vector2} from 'three';
@@ -111,30 +111,79 @@ const Background = () => {
 	});
 
 	return (
-		<Image src={dynamixBackgroundImg as string} x={0} y={0} zIndex={-200} width={1024} rotation={timer * 0}/>
+		<Image
+			src={dynamixBackgroundImg as string}
+			x={0}
+			y={0}
+			zIndex={-200}
+			width={1024}
+			rotation={timer * 0}
+		/>
 	);
 };
 
 const SceneController = () => {
 	const setSize = useThree((state) => state.setSize);
 	setSize(1024, 768);
+	window.scrollTo(0, 1);
+
+	useEffect(() => {
+		const resizeListener = () => {
+			setSize(1024, 768);
+		};
+		window.addEventListener('resize', resizeListener);
+
+		return () => {
+			window.removeEventListener('resize', resizeListener);
+		};
+	}, []);
 
 	return '';
 };
 
-const App = () => (
-	<Canvas orthographic camera={{zoom: 1}}>
-		<SceneController/>
-		<color attach="background" args={[0, 0, 0]}/>
-		<ambientLight/>
-		<Box position={[0, -300, -100]}/>
-		<Suspense fallback={<>Loading...</>}>
-			<Background/>
-			<Note x={0} y={0} width={300}/>
-			<Note x={200} y={250} width={150}/>
-		</Suspense>
-	</Canvas>
-);
+const getRgb = (color: string): [number, number, number] => {
+	if (color === 'black') {
+		return [0, 0, 0];
+	}
+	if (color === 'red') {
+		return [255, 0, 0];
+	}
+	if (color === 'green') {
+		return [0, 255, 0];
+	}
+	if (color === 'blue') {
+		return [0, 0, 255];
+	}
+	if (color === 'white') {
+		return [255, 255, 255];
+	}
+	return [0, 0, 0];
+};
+
+const App = () => {
+	const [color, setColor] = useState('black');
+	const canvasEl = useRef(null);
+
+	const handlePointerDown = useCallback(() => {
+		setColor(color === 'black' ? 'white' : 'black');
+	}, [setColor, color]);
+
+	return (
+		<div style={{width: '100%', height: '100%'}} onPointerDown={handlePointerDown}>
+			<Canvas ref={canvasEl} orthographic camera={{zoom: 1}}>
+				<SceneController/>
+				<color attach="background" args={getRgb(color)}/>
+				<ambientLight/>
+				<Box position={[0, -300, -100]}/>
+				<Suspense fallback={<>Loading...</>}>
+					<Background/>
+					<Note x={0} y={0} width={300}/>
+					<Note x={200} y={250} width={150}/>
+				</Suspense>
+			</Canvas>
+		</div>
+	);
+};
 
 ReactDOM.render(
 	<App/>,

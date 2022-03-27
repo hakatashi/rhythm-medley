@@ -1,4 +1,4 @@
-import {useLoader} from '@react-three/fiber';
+import {ThreeEvent, useLoader} from '@react-three/fiber';
 import React from 'react';
 import {TextureLoader} from 'three';
 
@@ -12,6 +12,7 @@ type ImageProps = {
 	scaleX?: number,
 	scaleY?: number,
 	rotation?: number,
+	onClick?: (event: ThreeEvent<MouseEvent>) => void,
 } & typeof defaultProps;
 
 const defaultProps = {
@@ -21,9 +22,10 @@ const defaultProps = {
 	height: 0,
 	scaleX: 1,
 	scaleY: 1,
+	onClick: null,
 };
 
-const Image = ({x, y, zIndex, width, height, scaleX, scaleY, src, rotation}: ImageProps) => {
+const Image = ({x, y, zIndex, width, height, scaleX, scaleY, src, rotation, onClick}: ImageProps) => {
 	const texture = useLoader(TextureLoader, src);
 
 	let renderWidth = width;
@@ -42,6 +44,7 @@ const Image = ({x, y, zIndex, width, height, scaleX, scaleY, src, rotation}: Ima
 		<sprite
 			position={[x, y, zIndex]}
 			scale={[renderWidth, renderHeight, 1]}
+			onClick={onClick}
 		>
 			<spriteMaterial
 				attach="material"
