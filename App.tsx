@@ -1,6 +1,7 @@
-import {Canvas, useFrame, useLoader} from '@react-three/fiber';
+import {Canvas, useFrame, useLoader, useThree} from '@react-three/fiber';
 import React, {useRef, useState, useCallback, Suspense} from 'react';
 import ReactDOM from 'react-dom';
+import useMeasure from 'react-use-measure';
 import {TextureLoader, Vector2} from 'three';
 import Image from './Image';
 import dynamixBackgroundImg from './images/dynamix-background.png';
@@ -38,19 +39,6 @@ const Box = (props) => {
 	);
 };
 
-const DynamixBackground = () => {
-	const texture = useLoader(TextureLoader, dynamixBackgroundImg as string);
-
-	return (
-		<sprite
-			position={[0, 0, -200]}
-			scale={[texture.image.width * 0.8, texture.image.height * 0.8, 1]}
-		>
-			<spriteMaterial attach="material" map={texture} sizeAttenuation={false}/>
-		</sprite>
-	);
-};
-
 const NoteLeft = (props: {x: number, y: number, width: number}) => {
 	const texture = useLoader(TextureLoader, dynamixNoteImg2 as string);
 	texture.offset = new Vector2(0, 0);
@@ -73,7 +61,7 @@ const NoteCenter = (props: {x: number, y: number, width: number}) => {
 
 	return (
 		<sprite position={[props.x, props.y, -200]} scale={[props.width, texture.image.height, 1]}>
-			<spriteMaterial attach="material" map={texture} sizeAttenuation={false} rotation={Math.PI / 2}/>
+			<spriteMaterial attach="material" map={texture} sizeAttenuation={false}/>
 		</sprite>
 	);
 };
@@ -114,17 +102,41 @@ const Note = (props: {x: number, y: number, width: number}) => {
 	);
 };
 
-ReactDOM.render(
-	<Canvas orthographic>
+const Background = () => {
+	const [timer, setTimer] = useState(Date.now());
+
+	useFrame(() => {
+		const time = Date.now();
+		setTimer(time - startTime);
+	});
+
+	return (
+		<Image src={dynamixBackgroundImg as string} x={0} y={0} zIndex={-200} width={1024} rotation={timer * 0}/>
+	);
+};
+
+const SceneController = () => {
+	const setSize = useThree((state) => state.setSize);
+	setSize(1024, 768);
+
+	return '';
+};
+
+const App = () => (
+	<Canvas orthographic camera={{zoom: 1}}>
+		<SceneController/>
 		<color attach="background" args={[0, 0, 0]}/>
 		<ambientLight/>
-		<pointLight position={[0, 0, 0]}/>
 		<Box position={[0, -300, -100]}/>
 		<Suspense fallback={<>Loading...</>}>
-			<Image src={dynamixBackgroundImg} x={0} y={0} zIndex={-200} scaleX={0.8} scaleY={0.8}/>
+			<Background/>
 			<Note x={0} y={0} width={300}/>
 			<Note x={200} y={250} width={150}/>
 		</Suspense>
-	</Canvas>,
+	</Canvas>
+);
+
+ReactDOM.render(
+	<App/>,
 	document.getElementById('root'),
 );

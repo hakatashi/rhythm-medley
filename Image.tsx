@@ -26,8 +26,17 @@ const defaultProps = {
 const Image = ({x, y, zIndex, width, height, scaleX, scaleY, src, rotation}: ImageProps) => {
 	const texture = useLoader(TextureLoader, src);
 
-	const renderWidth = width === 0 ? texture.image.width * scaleY : width;
-	const renderHeight = height === 0 ? texture.image.height * scaleX : height;
+	let renderWidth = width;
+	let renderHeight = height;
+
+	if (renderWidth === 0 && renderHeight == 0) {
+		renderWidth = texture.image.width * scaleY;
+		renderHeight = texture.image.height * scaleX;
+	} else if (renderWidth === 0) {
+		renderWidth = renderHeight * texture.image.width / texture.image.height;
+	} else if (renderHeight === 0) {
+		renderHeight = renderWidth * texture.image.height / texture.image.width;
+	}
 
 	return (
 		<sprite
