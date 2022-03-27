@@ -46,8 +46,8 @@ const NoteLeft = (props: {x: number, y: number, width: number}) => {
 
 	return (
 		<sprite
-			position={[props.x - props.width / 2 - texture.image.width * 0.45 / 2, props.y, -200]}
-			scale={[texture.image.width * 0.45, texture.image.height, 1]}
+			position={[props.x - props.width / 2 - texture.image.width * 0.45 / 4, props.y, -200]}
+			scale={[texture.image.width * 0.45 / 2, texture.image.height / 2, 1]}
 		>
 			<spriteMaterial attach="material" map={texture} sizeAttenuation={false}/>
 		</sprite>
@@ -60,7 +60,7 @@ const NoteCenter = (props: {x: number, y: number, width: number}) => {
 	texture.repeat.set(0.1, 1);
 
 	return (
-		<sprite position={[props.x, props.y, -200]} scale={[props.width, texture.image.height, 1]}>
+		<sprite position={[props.x, props.y, -200]} scale={[props.width, texture.image.height / 2, 1]}>
 			<spriteMaterial attach="material" map={texture} sizeAttenuation={false}/>
 		</sprite>
 	);
@@ -73,8 +73,8 @@ const NoteRight = (props: {x: number, y: number, width: number}) => {
 
 	return (
 		<sprite
-			position={[props.x + props.width / 2 + texture.image.width * 0.45 / 2, props.y, -200]}
-			scale={[texture.image.width * 0.45, texture.image.height, 1]}
+			position={[props.x + props.width / 2 + texture.image.width * 0.45 / 4, props.y, -200]}
+			scale={[texture.image.width * 0.45 / 2, texture.image.height / 2, 1]}
 		>
 			<spriteMaterial attach="material" map={texture} sizeAttenuation={false}/>
 		</sprite>
@@ -91,7 +91,7 @@ const Note = (props: {x: number, y: number, width: number}) => {
 		setTimer(time - startTime);
 	});
 
-	const offset = -(timer / 100 % 1000);
+	const offset = 0;
 
 	return (
 		<group>
@@ -107,7 +107,7 @@ const Background = () => {
 
 	useFrame(() => {
 		const time = Date.now();
-		setTimer(time - startTime);
+		setTimer(time);
 	});
 
 	return (
@@ -132,13 +132,12 @@ const SceneController = () => {
 			setSize(1024, 768);
 		};
 		window.addEventListener('resize', resizeListener);
-
 		return () => {
 			window.removeEventListener('resize', resizeListener);
 		};
 	}, []);
 
-	return '';
+	return <></>;
 };
 
 const getRgb = (color: string): [number, number, number] => {
@@ -160,25 +159,42 @@ const getRgb = (color: string): [number, number, number] => {
 	return [0, 0, 0];
 };
 
+const getCorrectedDimension = (screenWidth: number, screenHeight: number, screenX: number, screenY: number): [number, number] => {
+	console.log({screenWidth, screenHeight, screenX, screenY});
+	const zoom = Math.min(screenWidth / 1024, screenHeight / 768);
+	const x = screenWidth / 2;
+	const y = screenHeight / 2;
+	return [(screenX - x) / zoom, -(screenY - y) / zoom];
+};
+
 const App = () => {
-	const [color, setColor] = useState('black');
+	const [notes, setNotes] = useState<{x: number, y: number, createdAt: number}[]>([]);
+	const [ref, bounds] = useMeasure();
 	const canvasEl = useRef(null);
 
-	const handlePointerDown = useCallback(() => {
-		setColor(color === 'black' ? 'white' : 'black');
-	}, [setColor, color]);
+	const handlePointerDown = useCallback((event: React.TouchEvent) => {
+		for (const i of Array.from(Array(event.changedTouches.length).keys())) {
+			const touch = event.changedTouches.item(i);
+			const [x, y] = getCorrectedDimension(bounds.width, bounds.height, touch.clientX, touch.clientY);
+			setNotes((prevNotes) => [...prevNotes, {x, y, createdAt: Date.now()}]);
+		}
+	}, [setNotes, notes]);
+
+	const now = Date.now();
 
 	return (
-		<div style={{width: '100%', height: '100%'}} onPointerDown={handlePointerDown}>
+		<div ref={ref} style={{width: '100%', height: '100%'}} onTouchStart={handlePointerDown}>
 			<Canvas ref={canvasEl} orthographic camera={{zoom: 1}}>
 				<SceneController/>
-				<color attach="background" args={getRgb(color)}/>
+				<color attach="background" args={getRgb('black')}/>
 				<ambientLight/>
 				<Box position={[0, -300, -100]}/>
 				<Suspense fallback={<>Loading...</>}>
 					<Background/>
 					<Note x={0} y={0} width={300}/>
-					<Note x={200} y={250} width={150}/>
+					{notes.map((note, index) => (
+						now - note.createdAt < 1000 && <Note key={index} x={note.x} y={note.y} width={30}/>
+					))}
 				</Suspense>
 			</Canvas>
 		</div>
