@@ -1,6 +1,6 @@
-import {Canvas, useFrame, useLoader, useThree} from '@react-three/fiber';
+import {Canvas, useLoader, useThree} from '@react-three/fiber';
 import React, {useRef, useState, useCallback, useEffect, Suspense} from 'react';
-import ReactDOM from 'react-dom';
+import {Transition, TransitionGroup} from 'react-transition-group';
 import useMeasure from 'react-use-measure';
 import {TextureLoader, Vector2} from 'three';
 import Image from './Image';
@@ -8,6 +8,7 @@ import dynamixBackgroundImg from './images/dynamix-background.png';
 import dynamixNoteImg from './images/dynamix-note.png';
 import dynamixNoteImg2 from './images/dynamix-note2.png';
 import dynamixNoteImg3 from './images/dynamix-note3.png';
+import {isTouchDevice} from './lib/util';
 
 const NoteLeft = (props: {x: number, y: number, width: number}) => {
 	const texture = useLoader(TextureLoader, dynamixNoteImg2);
@@ -51,18 +52,8 @@ const NoteRight = (props: {x: number, y: number, width: number}) => {
 	);
 };
 
-const startTime = Date.now();
-
 const Note = (props: {x: number, y: number, width: number}) => {
-	const [timer, setTimer] = useState(0);
-
-	useFrame(() => {
-		const time = Date.now();
-		setTimer(time - startTime);
-	});
-
 	const offset = 0;
-
 	return (
 		<group>
 			<NoteLeft x={props.x} y={props.y + offset} width={props.width}/>
@@ -72,17 +63,15 @@ const Note = (props: {x: number, y: number, width: number}) => {
 	);
 };
 
-const Background = () => {
-	return (
-		<Image
-			src={dynamixBackgroundImg}
-			x={0}
-			y={0}
-			zIndex={-200}
-			width={1024}
-		/>
-	);
-};
+const Background = () => (
+	<Image
+		src={dynamixBackgroundImg}
+		x={0}
+		y={0}
+		zIndex={-200}
+		width={1024}
+	/>
+);
 
 const SceneController = () => {
 	const setSize = useThree((state) => state.setSize);
@@ -98,6 +87,7 @@ const SceneController = () => {
 		};
 	}, []);
 
+	// eslint-disable-next-line react/jsx-no-useless-fragment
 	return <></>;
 };
 
@@ -132,18 +122,45 @@ const App = () => {
 	const [ref, bounds] = useMeasure();
 	const canvasEl = useRef(null);
 
-	const handlePointerDown = useCallback((event: React.TouchEvent) => {
+	const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+	const [screenHeight, setScreenHeight] = useState(window.innerHeight);
+
+	useEffect(() => {
+		const handleResize = () => {
+			setScreenWidth(window.innerWidth);
+			setScreenHeight(window.innerHeight);
+		};
+		window.addEventListener('resize', handleResize);
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
+	}, []);
+
+	const handleTouchStart = useCallback((event: React.TouchEvent) => {
 		for (const i of Array.from(Array(event.changedTouches.length).keys())) {
 			const touch = event.changedTouches.item(i);
-			const [x, y] = getCorrectedDimension(bounds.width, bounds.height, touch.clientX, touch.clientY);
+			const [x, y] = getCorrectedDimension(screenWidth, screenHeight, touch.clientX, touch.clientY);
 			setNotes((prevNotes) => [...prevNotes, {x, y, createdAt: Date.now()}]);
 		}
-	}, [setNotes, notes]);
+	}, [setNotes]);
+
+	const handlePointerDown = useCallback((event: React.MouseEvent) => {
+		if (isTouchDevice) {
+			return;
+		}
+		const [x, y] = getCorrectedDimension(screenWidth, screenHeight, event.clientX, event.clientY);
+		setNotes([{x, y, createdAt: Date.now()}]);
+	}, [setNotes]);
 
 	const now = Date.now();
 
 	return (
-		<div ref={ref} style={{width: '100%', height: '100%'}} onTouchStart={handlePointerDown}>
+		<div
+			ref={ref}
+			style={{width: '100%', height: '100%'}}
+			onTouchStart={handleTouchStart}
+			onPointerDown={handlePointerDown}
+		>
 			<Canvas ref={canvasEl} orthographic camera={{zoom: 1}}>
 				<SceneController/>
 				<color attach="background" args={getRgb('black')}/>
@@ -151,16 +168,17 @@ const App = () => {
 				<Suspense fallback={<>Loading...</>}>
 					<Background/>
 					<Note x={0} y={0} width={300}/>
-					{notes.map((note, index) => (
-						now - note.createdAt < 1000 && <Note key={index} x={note.x} y={note.y} width={30}/>
-					))}
+					<TransitionGroup component="group">
+						{notes.map((note) => (
+							<Transition key={note.createdAt} in={false} timeout={500} unmountOnExit>
+								<Note x={note.x} y={note.y} width={30}/>
+							</Transition>
+						))}
+					</TransitionGroup>
 				</Suspense>
 			</Canvas>
 		</div>
 	);
 };
 
-ReactDOM.render(
-	<App/>,
-	document.getElementById('root'),
-);
+export default App;
