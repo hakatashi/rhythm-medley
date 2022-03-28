@@ -10,7 +10,7 @@ import dynamixNoteImg2 from './images/dynamix-note2.png';
 import dynamixNoteImg3 from './images/dynamix-note3.png';
 
 const NoteLeft = (props: {x: number, y: number, width: number}) => {
-	const texture = useLoader(TextureLoader, dynamixNoteImg2 as string);
+	const texture = useLoader(TextureLoader, dynamixNoteImg2);
 	texture.offset = new Vector2(0, 0);
 	texture.repeat.set(0.45, 1);
 
@@ -25,7 +25,7 @@ const NoteLeft = (props: {x: number, y: number, width: number}) => {
 };
 
 const NoteCenter = (props: {x: number, y: number, width: number}) => {
-	const texture = useLoader(TextureLoader, dynamixNoteImg as string);
+	const texture = useLoader(TextureLoader, dynamixNoteImg);
 	texture.offset = new Vector2(0.45, 0);
 	texture.repeat.set(0.1, 1);
 
@@ -37,7 +37,7 @@ const NoteCenter = (props: {x: number, y: number, width: number}) => {
 };
 
 const NoteRight = (props: {x: number, y: number, width: number}) => {
-	const texture = useLoader(TextureLoader, dynamixNoteImg3 as string);
+	const texture = useLoader(TextureLoader, dynamixNoteImg3);
 	texture.offset = new Vector2(0.55, 0);
 	texture.repeat.set(0.45, 1);
 
@@ -75,7 +75,7 @@ const Note = (props: {x: number, y: number, width: number}) => {
 const Background = () => {
 	return (
 		<Image
-			src={dynamixBackgroundImg as string}
+			src={dynamixBackgroundImg}
 			x={0}
 			y={0}
 			zIndex={-200}
@@ -87,7 +87,6 @@ const Background = () => {
 const SceneController = () => {
 	const setSize = useThree((state) => state.setSize);
 	setSize(1024, 768);
-	window.scrollTo(0, 1);
 
 	useEffect(() => {
 		const resizeListener = () => {
@@ -122,11 +121,10 @@ const getRgb = (color: string): [number, number, number] => {
 };
 
 const getCorrectedDimension = (screenWidth: number, screenHeight: number, screenX: number, screenY: number): [number, number] => {
-	console.log({screenWidth, screenHeight, screenX, screenY});
 	const zoom = Math.min(screenWidth / 1024, screenHeight / 768);
-	const x = screenWidth / 2;
-	const y = screenHeight / 2;
-	return [(screenX - x) / zoom, -(screenY - y) / zoom];
+	const offsetX = screenWidth / 2;
+	const offsetY = screenHeight / 2;
+	return [(screenX - offsetX) / zoom, -(screenY - offsetY) / zoom];
 };
 
 const App = () => {
