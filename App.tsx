@@ -1,6 +1,7 @@
 import {Canvas, useFrame, useLoader, useThree} from '@react-three/fiber';
 import React, {useRef, useState, useCallback, useEffect, Suspense} from 'react';
 import ReactDOM from 'react-dom';
+import useMeasure from 'react-use-measure';
 import {Mesh, TextureLoader, Vector2} from 'three';
 import Image from './Image';
 import dynamixBackgroundImg from './images/dynamix-background.png';
@@ -102,13 +103,6 @@ const Note = (props: {x: number, y: number, width: number}) => {
 };
 
 const Background = () => {
-	const [timer, setTimer] = useState(Date.now());
-
-	useFrame(() => {
-		const time = Date.now();
-		setTimer(time);
-	});
-
 	return (
 		<Image
 			src={dynamixBackgroundImg as string}
@@ -116,7 +110,6 @@ const Background = () => {
 			y={0}
 			zIndex={-200}
 			width={1024}
-			rotation={timer * 0}
 		/>
 	);
 };
