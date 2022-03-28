@@ -2,9 +2,11 @@
   "name": "rhythm-medley",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "parcel index.html",
+    "build": "parcel build index.html",
     "lint": "eslint --ext .js,.ts,.jsx,.tsx --ignore-path .gitignore --fix ."
   },
   "repository": {
@@ -25,6 +27,7 @@
     "@types/three": "^0.138.0",
     "@typescript-eslint/parser": "^5.16.0",
     "eslint": "^7.32.0",
+    "parcel": "^2.4.0",
     "typescript": "^4.6.2"
   },
   "dependencies": {
