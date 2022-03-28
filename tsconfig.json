@@ -1,7 +1,13 @@
 {
     "compilerOptions": {
         "allowSyntheticDefaultImports": true,
-        "jsx": "react"
-    },
-    "include": ["index.d.ts"]
+        "typeRoots": [
+            "types",
+            "node_modules/@types"
+        ],
+        "jsx": "react",
+        "esModuleInterop": true,
+        "target": "ES2017",
+        "moduleResolution": "node"
+    }
 }

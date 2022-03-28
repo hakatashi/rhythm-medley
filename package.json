@@ -20,6 +20,8 @@
   "homepage": "https://github.com/hakatashi/rhythm-medley#readme",
   "devDependencies": {
     "@hakatashi/eslint-config": "^1.18.0",
+    "@types/react": "^17.0.43",
+    "@types/react-reconciler": "^0.26.4",
     "@types/three": "^0.138.0",
     "@typescript-eslint/parser": "^5.16.0",
     "eslint": "^7.32.0",
