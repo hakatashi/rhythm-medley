@@ -1,8 +1,7 @@
 import {Canvas, useFrame, useLoader, useThree} from '@react-three/fiber';
 import React, {useRef, useState, useCallback, useEffect, Suspense} from 'react';
 import ReactDOM from 'react-dom';
-import useMeasure from 'react-use-measure';
-import {TextureLoader, Vector2} from 'three';
+import {Mesh, TextureLoader, Vector2} from 'three';
 import Image from './Image';
 import dynamixBackgroundImg from './images/dynamix-background.png';
 import dynamixNoteImg from './images/dynamix-note.png';
@@ -10,7 +9,7 @@ import dynamixNoteImg2 from './images/dynamix-note2.png';
 import dynamixNoteImg3 from './images/dynamix-note3.png';
 
 const Box = (props) => {
-	const ref = useRef();
+	const ref = useRef<Mesh>();
 
 	const [hover, setHover] = useState(false);
 	const [click, setClick] = useState(false);
