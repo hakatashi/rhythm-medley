@@ -2,42 +2,12 @@ import {Canvas, useFrame, useLoader, useThree} from '@react-three/fiber';
 import React, {useRef, useState, useCallback, useEffect, Suspense} from 'react';
 import ReactDOM from 'react-dom';
 import useMeasure from 'react-use-measure';
-import {Mesh, TextureLoader, Vector2} from 'three';
+import {TextureLoader, Vector2} from 'three';
 import Image from './Image';
 import dynamixBackgroundImg from './images/dynamix-background.png';
 import dynamixNoteImg from './images/dynamix-note.png';
 import dynamixNoteImg2 from './images/dynamix-note2.png';
 import dynamixNoteImg3 from './images/dynamix-note3.png';
-
-const Box = (props) => {
-	const ref = useRef<Mesh>();
-
-	const [hover, setHover] = useState(false);
-	const [click, setClick] = useState(false);
-
-	useFrame(() => {
-		ref.current.rotation.x += 0.01;
-		ref.current.rotation.y += 0.01;
-	});
-
-	const handlePointerOver = useCallback(() => setHover(true), [setHover]);
-	const handlePointerOut = useCallback(() => setHover(false), [setHover]);
-	const handleClick = useCallback(() => setClick(!click), [setClick, click]);
-
-	return (
-		<mesh
-			{...props}
-			ref={ref}
-			scale={click ? 1.5 : 1}
-			onClick={handleClick}
-			onPointerOver={handlePointerOver}
-			onPointerOut={handlePointerOut}
-		>
-			<boxGeometry args={[100, 100, 100]}/>
-			<meshLambertMaterial color={hover ? 'hotpink' : 'orange'}/>
-		</mesh>
-	);
-};
 
 const NoteLeft = (props: {x: number, y: number, width: number}) => {
 	const texture = useLoader(TextureLoader, dynamixNoteImg2 as string);
@@ -180,7 +150,6 @@ const App = () => {
 				<SceneController/>
 				<color attach="background" args={getRgb('black')}/>
 				<ambientLight/>
-				<Box position={[0, -300, -100]}/>
 				<Suspense fallback={<>Loading...</>}>
 					<Background/>
 					<Note x={0} y={0} width={300}/>
