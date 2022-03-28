@@ -29,7 +29,7 @@ const Image = ({x, y, zIndex, width, height, scaleX, scaleY, src, rotation}: Ima
 	let renderWidth = width;
 	let renderHeight = height;
 
-	if (renderWidth === 0 && renderHeight == 0) {
+	if (renderWidth === 0 && renderHeight === 0) {
 		renderWidth = texture.image.width * scaleY;
 		renderHeight = texture.image.height * scaleX;
 	} else if (renderWidth === 0) {

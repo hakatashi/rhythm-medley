@@ -1,7 +1,6 @@
 import {Canvas, useFrame, useLoader, useThree} from '@react-three/fiber';
 import React, {useRef, useState, useCallback, Suspense} from 'react';
 import ReactDOM from 'react-dom';
-import useMeasure from 'react-use-measure';
 import {Mesh, TextureLoader, Vector2} from 'three';
 import Image from './Image';
 import dynamixBackgroundImg from './images/dynamix-background.png';
