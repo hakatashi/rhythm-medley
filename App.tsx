@@ -1,10 +1,10 @@
-import {Canvas, useLoader, useThree} from '@react-three/fiber';
+import {Canvas, useFrame, useLoader, useThree} from '@react-three/fiber';
 import React, {useRef, useState, useCallback, useEffect, Suspense} from 'react';
 import {Transition, TransitionGroup} from 'react-transition-group';
-import useMeasure from 'react-use-measure';
-import {TextureLoader, Vector2} from 'three';
+import {AdditiveBlending, NormalBlending, TextureLoader, Vector2} from 'three';
 import Image from './Image';
 import dynamixBackgroundImg from './images/dynamix-background.png';
+import dynamixHollowImg from './images/dynamix-hollow.png';
 import dynamixNoteImg from './images/dynamix-note.png';
 import dynamixNoteImg2 from './images/dynamix-note2.png';
 import dynamixNoteImg3 from './images/dynamix-note3.png';
@@ -117,9 +117,28 @@ const getCorrectedDimension = (screenWidth: number, screenHeight: number, screen
 	return [(screenX - offsetX) / zoom, -(screenY - offsetY) / zoom];
 };
 
+const DynamixHollow = ({x}: {x: number}) => {
+	const [timer, setTimer] = useState(0);
+	const [initTime, setInitTime] = useState(Date.now());
+
+	useFrame(() => {
+		setTimer(Date.now() - initTime);
+	});
+
+	return (
+		<Image
+			x={x}
+			y={-5}
+			height={576}
+			src={dynamixHollowImg}
+			blending={NormalBlending}
+			opacity={Math.max((300 - timer) / 300, 0)}
+		/>
+	);
+};
+
 const App = () => {
 	const [notes, setNotes] = useState<{x: number, y: number, createdAt: number}[]>([]);
-	const [ref, bounds] = useMeasure();
 	const canvasEl = useRef(null);
 
 	const [screenWidth, setScreenWidth] = useState(window.innerWidth);
@@ -152,11 +171,8 @@ const App = () => {
 		setNotes([{x, y, createdAt: Date.now()}]);
 	}, [setNotes]);
 
-	const now = Date.now();
-
 	return (
 		<div
-			ref={ref}
 			style={{width: '100%', height: '100%'}}
 			onTouchStart={handleTouchStart}
 			onPointerDown={handlePointerDown}
@@ -171,7 +187,7 @@ const App = () => {
 					<TransitionGroup component="group">
 						{notes.map((note) => (
 							<Transition key={note.createdAt} in={false} timeout={500} unmountOnExit>
-								<Note x={note.x} y={note.y} width={30}/>
+								<DynamixHollow x={note.x}/>
 							</Transition>
 						))}
 					</TransitionGroup>

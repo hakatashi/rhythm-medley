@@ -1,6 +1,6 @@
 import {ThreeEvent, useLoader} from '@react-three/fiber';
 import React from 'react';
-import {TextureLoader} from 'three';
+import {Blending, NormalBlending, TextureLoader} from 'three';
 
 type ImageProps = {
 	src: string,
@@ -12,6 +12,8 @@ type ImageProps = {
 	scaleX?: number,
 	scaleY?: number,
 	rotation?: number,
+	blending?: Blending,
+	opacity?: number,
 	onClick?: (event: ThreeEvent<MouseEvent>) => void,
 } & typeof defaultProps;
 
@@ -23,9 +25,11 @@ const defaultProps = {
 	scaleX: 1,
 	scaleY: 1,
 	onClick: null,
+	blending: NormalBlending,
+	opacity: 1,
 };
 
-const Image = ({x, y, zIndex, width, height, scaleX, scaleY, src, rotation, onClick}: ImageProps) => {
+const Image = ({x, y, zIndex, width, height, scaleX, scaleY, src, rotation, onClick, blending, opacity}: ImageProps) => {
 	const texture = useLoader(TextureLoader, src);
 
 	let renderWidth = width;
@@ -51,6 +55,8 @@ const Image = ({x, y, zIndex, width, height, scaleX, scaleY, src, rotation, onCl
 				map={texture}
 				sizeAttenuation={false}
 				rotation={rotation}
+				blending={blending}
+				opacity={opacity}
 			/>
 		</sprite>
 	);
